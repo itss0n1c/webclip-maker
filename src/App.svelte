@@ -3,7 +3,6 @@ import { generateConfig } from "./commons";
 import type { Config } from './commons'
 	let form: HTMLFormElement
 	let genbutton: HTMLInputElement
-	let dlbutton: HTMLAnchorElement
 	let icon: string
 	let iconel = HTMLInputElement.prototype
 
