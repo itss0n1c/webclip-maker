@@ -3,6 +3,8 @@ import { generateConfig } from "./commons";
 import type { Config } from './commons'
 	let form: HTMLFormElement
 	let genbutton: HTMLInputElement
+	let dlset = false
+	let dlurl: string
 	let icon: string
 	let iconel = HTMLInputElement.prototype
 
@@ -31,24 +33,27 @@ import type { Config } from './commons'
 		iconel.click()
 	}	
 
-	function generate(evt: Event) {
+	async function generate(evt: Event) {
 		evt.preventDefault()
 		genbutton.value = "Generating..."
+		dlurl = ""
+		dlset = false;
 		let formdata = new FormData(form)
 		let data: Config = {}
 		formdata.forEach((v, k) => {
 			data[k] = v;
 		})
 
-		let parseddataurl = parsedDataURL(icon)
-		data.icon = parseddataurl.data; 
-		
-	 	let config = generateConfig(data as Config)
+		let icondata = await fetch(icon).then(r => r.arrayBuffer())
+		data.icon = new Uint8Array(icondata)
+
+		let config = generateConfig(data as Config)
 	 	let blob = new Blob([config], {type: "application/x-apple-aspen-config"})
 	 	let url = URL.createObjectURL(blob)
-	 	genbutton.value = "Generate"
-	
-	 	window.open(url, "_blank")
+		genbutton.value = "Generate"
+		dlurl = url;
+		dlset = true;
+	 //	window.open(url, "_blank")
 	}
 
 	
@@ -78,8 +83,10 @@ import type { Config } from './commons'
 			</div>
 
 			<input bind:this={genbutton} type="submit" class="submit" value="Generate" />
-		
-
+			
+			{#if dlset}
+				<p>Download: <a href={dlurl}>install.mobileconfig</a></p>
+			{/if}
 		</form>
 	</section>
 </main>
