@@ -6,7 +6,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "svelte3"
     ],
     "extends": [
         "eslint:recommended",
@@ -17,6 +18,12 @@
         "node": true,
         "es6": true
     },
+    "overrides": [
+        {
+          "files": ["*.svelte"],
+          "processor": "svelte3/svelte3"
+        }
+      ],
     "rules": {
         "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/no-explicit-any": "off",

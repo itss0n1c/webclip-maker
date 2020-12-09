@@ -1,62 +1,24 @@
 <script lang="ts">
 import { generateConfig } from "./commons";
 import type { Config } from './commons'
-	let form: HTMLFormElement
-	let genbutton: HTMLInputElement
-	let dlset = false
-	let dlurl: string
-	let icon: string
-	let iconel = HTMLInputElement.prototype
+import AddApp from "./addApp.svelte";
+import { onMount } from "svelte";
 
-	function handleIcon() {
-		let val = iconel.files[0]
-		let reader = new FileReader()
-		reader.onload = (e) => {
-			icon = e.target.result as string;
-		}
-		reader.readAsDataURL(val)
-		console.log(icon)
-	}
+let generate: (evt: Event) => Promise<void>
+let modaldata: {form: HTMLFormElement}
+let showModal = true
 
-	function parsedDataURL(url: string): {mime: string, data: string} {
-		let start = url.indexOf("data:") + 5
-		let end = url.indexOf(";base64,")
-		let mime = url.substring(start, end)
-		let data = url.substr(end + 8, url.length)
-		return {
-			mime,
-			data
-		}
-	}
+function createProfile() {
+	showModal = true;
+}
 
-	function editIcon() {
-		iconel.click()
-	}	
+function clearProfile() {
+	showModal = false;
+}
 
-	async function generate(evt: Event) {
-		evt.preventDefault()
-		genbutton.value = "Generating..."
-		dlurl = ""
-		dlset = false;
-		let formdata = new FormData(form)
-		let data: Config = {}
-		formdata.forEach((v, k) => {
-			data[k] = v;
-		})
 
-		let icondata = await fetch(icon).then(r => r.arrayBuffer())
-		data.icon = new Uint8Array(icondata)
 
-		let config = generateConfig(data as Config)
-	 	let blob = new Blob([config], {type: "application/x-apple-aspen-config"})
-	 	let url = URL.createObjectURL(blob)
-		genbutton.value = "Generate"
-		dlurl = url;
-		dlset = true;
-	 //	window.open(url, "_blank")
-	}
 
-	
 
 </script>
 
@@ -64,31 +26,19 @@ import type { Config } from './commons'
 	<section class="header">
 		<h1>Webclip Maker</h1>
 	</section>
-	<section class="form">
-		<p>Fill in the form below to create a webclip:</p>
-		<form bind:this={form} on:submit={generate} enctype="multipart/form-data">
-			<div class="formgroup">
-				<h3>Config Settings</h3>
-				<input type="text" name="config_name" placeholder="Profile Name" required/>
-				<input type="text" name="config_author" placeholder="Profile Author" required/>
-			</div>
-			<div class="formgroup">
-				<h3>Web App Settings</h3>
-				<input type="text" name="name" placeholder="Name" required/>
-				<div class="icon" on:click={editIcon}>
-					<input bind:this={iconel} on:change={handleIcon} type="file" name="icon" style="display: none" required/>
-					<img src={icon} alt="Click to add Icon" />
-				</div>
-				<input type="url" name="url" placeholder="URL" required/>
-			</div>
-
-			<input bind:this={genbutton} type="submit" class="submit" value="Generate" />
-			
-			{#if dlset}
-				<p>Download: <a href={dlurl}>install.mobileconfig</a></p>
-			{/if}
-		</form>
+	<section>
+		<p>You don't seem to have any saved web app profiles... Make one below!</p>
+		<div class="button" on:click={createProfile}>Create</div>
 	</section>
+	<div class="modal-overlay" hidden={!showModal}></div>
+	<div class="modal" hidden={!showModal}>
+		<div class="buttons">
+			<div on:click={modaldata.form.requestSubmit()}>Generate</div>
+			<div class="red" on:click={clearProfile}>&#10005;</div>
+		</div>
+		<svelte:component this={AddApp} bind:generate={generate} bind:exported={modaldata} />
+	</div>
+	
 </main>
 
 <style>
@@ -96,24 +46,7 @@ import type { Config } from './commons'
 		margin-bottom: 2rem;
 	}
 
-	section.form form .formgroup {
-		margin-bottom: 2rem;
-	}
-
-	section.form form .formgroup input {
-		display:block;
-		width: 20rem;
-		background: #333;
-		border-radius: 0.5rem;
-		border:0;
-		box-shadow: 0px 0px 5px #1a1a1a;
-		padding: 0.5rem;
-		margin-bottom: 1rem;
-		color: #efefef;
-	}
-
-
-	section.form form .submit {
+	.button {
 		background: #007aff;
 		color: white;
 		border:0;
@@ -124,21 +57,66 @@ import type { Config } from './commons'
 		border-radius: 0.5rem;
 		text-decoration: none;
 	}
-	
-	.icon {
-		padding: 0.5rem 1.5rem;
-		background: #333;
-		display:flex;
-		justify-content: center;
-		align-items: center;
-		width: 18rem;
-		margin-bottom: 1rem;
+
+	.modal {
+		top: 5%;
+		left: 30%;
+		right:30%;
+		position: absolute;
+		padding: 2rem;
+		background: #1f1f1f;
 		border-radius: 0.5rem;
 	}
+	
+	.modal .buttons {
+		float:right;
+		
+	}
 
-	.icon img {
-		max-width: 10rem;
-		max-height: 10rem;
-		border-radius: 1.5rem;
+	.modal .buttons > div {
+		display: inline;
+		background: #2a2a2a;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		color: #666;
+		cursor: pointer;
+	}
+
+	.modal .buttons > div:active {
+		opacity: 0.5;
+	}
+
+	.modal .buttons > div.red {
+		background-color: rgb(225, 57, 57);
+		color: white;
+	}
+
+	.modal-overlay {
+		top:0;
+		left:0;
+		right:0;
+		bottom:0;
+		position: absolute;
+		background: #111;
+		opacity: 0.6;
+	}
+	
+
+	@media only screen and (max-width: 1000px) {
+		.modal {
+			top:0;
+			left:0;
+			right:0;
+			bottom:0;
+
+		}
+		.modal-overlay {
+			position: unset;
+			display:none;
+		}
 	}
 </style>
