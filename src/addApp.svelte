@@ -98,6 +98,7 @@ import IconHandler from "./IconHandler.svelte";
 				</div>
 			{/each}
 			<div class="button" on:click={addPayload}>Add App</div>
+			<br /><br />
 
 		<!-- <input bind:this={genbutton} type="submit" class="submit" value="Generate" /> -->
 		

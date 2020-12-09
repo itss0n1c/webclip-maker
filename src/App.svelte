@@ -12,7 +12,7 @@ function createProfile() {
 	showModal = true;
 }
 
-function clearProfile() {
+function closeProfile() {
 	showModal = false;
 }
 
@@ -30,11 +30,11 @@ function clearProfile() {
 		<p>You don't seem to have any saved web app profiles... Make one below!</p>
 		<div class="button" on:click={createProfile}>Create</div>
 	</section>
-	<div class="modal-overlay" hidden={!showModal}></div>
-	<div class="modal" hidden={!showModal}>
+	<div class="modal-overlay" hidden={!showModal} on:click={closeProfile}></div>
+<div class="modal {showModal ? 'show' : ''}">
 		<div class="buttons">
 			<div on:click={modaldata.form.requestSubmit()}>Generate</div>
-			<div class="red" on:click={clearProfile}>&#10005;</div>
+			<div class="red" on:click={closeProfile}>&#10005;</div>
 		</div>
 		<svelte:component this={AddApp} bind:generate={generate} bind:exported={modaldata} />
 	</div>
@@ -62,10 +62,22 @@ function clearProfile() {
 		top: 5%;
 		left: 30%;
 		right:30%;
+		bottom: 5%;
 		position: absolute;
 		padding: 2rem;
 		background: #1f1f1f;
 		border-radius: 0.5rem;
+		overflow: auto;
+		z-index: 2;
+		visibility: hidden;
+		opacity: 0;
+		transition: visibility 0s, opacity 0.5s ease-in-out;
+		-webkit-transition: visibility 0s, opacity 0.5s ease-in-out;
+	}
+
+	.modal.show {
+		visibility: visible;
+		opacity:1;
 	}
 	
 	.modal .buttons {
