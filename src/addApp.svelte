@@ -1,8 +1,8 @@
 <script lang="ts">
-import { generateConfig } from "./commons";
-import type { Config } from "./commons";
+
 import EntryCell from "./EntryCell.svelte";
 import IconHandler from "./IconHandler.svelte";
+import type { Config } from "./mcgen";
 
 	export const exported: {form: HTMLFormElement} = {form: null}
 	$: form = exported.form
@@ -10,11 +10,9 @@ import IconHandler from "./IconHandler.svelte";
 	let dlset = false
 	let dlurl: string
 
-	let config: Config = {
-		config_name: "",
-		config_author: "",
-		webclips: []
-	}
+	export let config: Config
+	globalThis.config = config;
+
 
 	$: payloads = config.webclips;
 
@@ -32,20 +30,25 @@ import IconHandler from "./IconHandler.svelte";
 		}
 	}
 
+	interface IconEvent extends Event {
+		detail: {
+			icon: string,
+			index: number
+		}	
+	}
+
+	function handleIcon(e: IconEvent) {
+		if(typeof e.detail.icon !== "string" || typeof e.detail.index !== "number") return false;
+		config.loadIcon(e.detail.index)
+	}
+
 	export async function generate(evt: Event) {
 		evt.preventDefault()
 		let data = config;
-		for(let id in data.webclips) {
-			let webclip = data.webclips[id]
-			let icondata = await fetch(webclip.iconurl).then(r => r.arrayBuffer())
-			data.webclips[id].icon = new Uint8Array(icondata)
-		}
-		//console.log(data)
-		 let gen = generateConfig(data as Config)
-		 //console.log(gen)
+		
+		let gen = data.compile()
 	 	let blob = new Blob([gen], {type: "application/x-apple-aspen-config"})
 	 	let url = URL.createObjectURL(blob)
-		//genbutton.value = "Generate"
 		dlurl = url;
 		dlset = true;
 	}
@@ -92,7 +95,7 @@ import IconHandler from "./IconHandler.svelte";
 				<div class="formgroup">
 						<EntryCell title="Web App Settings" on:message={handleCell} cellid={index}>
 							<input type="text" name="name[{index}]" placeholder="Name" bind:value={config.webclips[index].name} required/>
-							<IconHandler index={index} bind:icon={config.webclips[index].iconurl} />
+							<IconHandler index={index} on:message={handleIcon} bind:icon={config.webclips[index].iconurl} />
 							<input type="url" name="url[{index}]" placeholder="URL" bind:value={config.webclips[index].url} required/>
 						</EntryCell>
 				</div>

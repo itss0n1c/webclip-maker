@@ -1,4 +1,7 @@
 <script lang="ts">
+import { createEventDispatcher } from "svelte";
+
+
 	let iconel: HTMLInputElement
 	export let icon: string = ""
 	export let index: number
@@ -7,14 +10,19 @@
 		iconel.click()
 	}
 
+	const dispatch = createEventDispatcher()
+
 	function handleIcon() {
 		let val = iconel.files[0]
 		let reader = new FileReader()
 		reader.onload = (e) => {
 			icon = e.target.result as string;
+
+			dispatch("message", { icon, index })
 		}
 		reader.readAsDataURL(val)
 		console.log(icon)
+		
 	}
 
 </script>

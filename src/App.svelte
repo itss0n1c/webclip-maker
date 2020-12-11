@@ -1,14 +1,24 @@
 <script lang="ts">
-import { generateConfig } from "./commons";
-import type { Config } from './commons'
 import AddApp from "./addApp.svelte";
 import { onMount } from "svelte";
+import { Configs } from "./stores";
+import { Config } from "./mcgen";
+let configs = new Configs()
+$: mconfigs = configs.array()
+onMount(() => {
+	console.log(mconfigs)
+})
+globalThis.configs = configs;
+let currentConfig: Config
+
 
 let generate: (evt: Event) => Promise<void>
 let modaldata: {form: HTMLFormElement}
-let showModal = true
+let showModal = false
 
 function createProfile() {
+	let config = new Config()
+	currentConfig = configs.add()
 	showModal = true;
 }
 
@@ -17,6 +27,14 @@ function closeProfile() {
 }
 
 
+function openConfig(e: MouseEvent) {
+	let el = e.target as HTMLDivElement;
+	console.log(el)
+	let id = [...el.attributes].find(el => el.name == "id").value
+	console.log(configs.get(id))
+	let currentConfig = configs.get(id)
+	showModal = true;
+}
 
 
 
@@ -27,17 +45,26 @@ function closeProfile() {
 		<h1>Webclip Maker</h1>
 	</section>
 	<section>
-		<p>You don't seem to have any saved web app profiles... Make one below!</p>
 		<div class="button" on:click={createProfile}>Create</div>
+		<h3>Saved Configurations</h3>
+		{#each configs.array() as config}
+			<div class="cell" id={config.id} on:click={openConfig}>
+				<p id={config.id}>{config.id}</p>
+			</div>
+		{:else}
+			<p>You don't seem to have any saved web app profiles... Make one below!</p>
+		{/each}
 	</section>
-	<div class="modal-overlay" hidden={!showModal} on:click={closeProfile}></div>
-<div class="modal {showModal ? 'show' : ''}">
-		<div class="buttons">
-			<div on:click={modaldata.form.requestSubmit()}>Generate</div>
-			<div class="red" on:click={closeProfile}>&#10005;</div>
+	{#if showModal}
+		<div class="modal-overlay" on:click={closeProfile}></div>
+		<div class="modal show">
+			<div class="buttons">
+				<div on:click={modaldata.form.requestSubmit()}>Generate</div>
+				<div class="red" on:click={closeProfile}>&#10005;</div>
+			</div>
+			<svelte:component this={AddApp} bind:generate={generate} bind:exported={modaldata} bind:config={currentConfig} />
 		</div>
-		<svelte:component this={AddApp} bind:generate={generate} bind:exported={modaldata} />
-	</div>
+	{/if}
 	
 </main>
 
@@ -56,6 +83,21 @@ function closeProfile() {
 		justify-content: center;
 		border-radius: 0.5rem;
 		text-decoration: none;
+	}
+
+	.cell {
+		padding: 0.5rem 1rem;
+		background: #2a2a2a;
+		border-radius: 0.5rem;
+		cursor: pointer;
+	}
+
+	.cell:hover {
+		opacity: 0.9;
+	}
+
+	.cell:active {
+		opacity: 0.7;
 	}
 
 	.modal {
