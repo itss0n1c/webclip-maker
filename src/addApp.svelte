@@ -2,7 +2,7 @@
 
 import EntryCell from "./EntryCell.svelte";
 import IconHandler from "./IconHandler.svelte";
-import type { Config } from "./mcgen";
+import { Config } from "./mcgen";
 
 	export const exported: {form: HTMLFormElement} = {form: null}
 	$: form = exported.form
@@ -10,7 +10,7 @@ import type { Config } from "./mcgen";
 	let dlset = false
 	let dlurl: string
 
-	export let config: Config
+	export let config: Config = new Config()
 	globalThis.config = config;
 
 
@@ -40,17 +40,6 @@ import type { Config } from "./mcgen";
 	function handleIcon(e: IconEvent) {
 		if(typeof e.detail.icon !== "string" || typeof e.detail.index !== "number") return false;
 		config.loadIcon(e.detail.index)
-	}
-
-	export async function generate(evt: Event) {
-		evt.preventDefault()
-		let data = config;
-		
-		let gen = data.compile()
-	 	let blob = new Blob([gen], {type: "application/x-apple-aspen-config"})
-	 	let url = URL.createObjectURL(blob)
-		dlurl = url;
-		dlset = true;
 	}
 
 	function addPayload() {
@@ -85,7 +74,7 @@ import type { Config } from "./mcgen";
 </script>
 
 <main>
-	<form bind:this={exported.form} on:submit={generate} enctype="multipart/form-data">
+	<form bind:this={exported.form} on:submit|preventDefault={config.generate} enctype="multipart/form-data">
 		<div class="formgroup">
 			<h3>Config Settings</h3>
 			<input type="text" name="config_name" placeholder="Profile Name" bind:value={config.config_name} required/>

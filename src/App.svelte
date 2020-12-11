@@ -2,7 +2,7 @@
 import AddApp from "./addApp.svelte";
 import { onMount } from "svelte";
 import { Configs } from "./stores";
-import { Config } from "./mcgen";
+import type { Config } from "./mcgen";
 let configs = new Configs()
 $: mconfigs = configs.array()
 onMount(() => {
@@ -12,17 +12,18 @@ globalThis.configs = configs;
 let currentConfig: Config
 
 
-let generate: (evt: Event) => Promise<void>
+
 let modaldata: {form: HTMLFormElement}
 let showModal = false
 
 function createProfile() {
-	let config = new Config()
 	currentConfig = configs.add()
 	showModal = true;
 }
 
 function closeProfile() {
+	modaldata = undefined;
+	currentConfig = undefined;
 	showModal = false;
 }
 
@@ -62,7 +63,7 @@ function openConfig(e: MouseEvent) {
 				<div on:click={modaldata.form.requestSubmit()}>Generate</div>
 				<div class="red" on:click={closeProfile}>&#10005;</div>
 			</div>
-			<svelte:component this={AddApp} bind:generate={generate} bind:exported={modaldata} bind:config={currentConfig} />
+			<svelte:component this={AddApp} bind:config={currentConfig} bind:exported={modaldata} />
 		</div>
 	{/if}
 	

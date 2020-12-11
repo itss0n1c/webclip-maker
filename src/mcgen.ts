@@ -107,4 +107,11 @@ export class Config {
 		}
 		return result;
 	}
+
+	async generate(): Promise<void> {
+		const gen = this.compile();
+		const blob = new Blob([ gen ], { type: 'application/x-apple-aspen-config' });
+		const url = URL.createObjectURL(blob);
+		window.open(url, '_blank');
+	}
 }
