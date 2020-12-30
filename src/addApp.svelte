@@ -2,18 +2,18 @@
 
 import EntryCell from "./EntryCell.svelte";
 import IconHandler from "./IconHandler.svelte";
-import { Config } from "./mcgen";
+import { Configs } from "./stores";
 
-	export const exported: {form: HTMLFormElement} = {form: null}
-	$: form = exported.form
+	
 	let genbutton: HTMLInputElement
 	let dlset = false
 	let dlurl: string
 
-	export let config: Config = new Config()
+	export let id: string
+	
+	let config = $Configs.find(config => config.id == id)
+	
 	globalThis.config = config;
-
-
 	$: payloads = config.webclips;
 
 	let icon: string
@@ -74,7 +74,7 @@ import { Config } from "./mcgen";
 </script>
 
 <main>
-	<form bind:this={exported.form} on:submit|preventDefault={config.generate} enctype="multipart/form-data">
+	<form enctype="multipart/form-data">
 		<div class="formgroup">
 			<h3>Config Settings</h3>
 			<input type="text" name="config_name" placeholder="Profile Name" bind:value={config.config_name} required/>
