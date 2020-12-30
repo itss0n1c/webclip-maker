@@ -1,21 +1,19 @@
 <script lang="ts">
-import { generateConfig } from "./commons";
-import type { Config } from "./commons";
+
 import EntryCell from "./EntryCell.svelte";
 import IconHandler from "./IconHandler.svelte";
+import { Configs } from "./stores";
 
-	export const exported: {form: HTMLFormElement} = {form: null}
-	$: form = exported.form
+	
 	let genbutton: HTMLInputElement
 	let dlset = false
 	let dlurl: string
 
-	let config: Config = {
-		config_name: "",
-		config_author: "",
-		webclips: []
-	}
-
+	export let id: string
+	
+	let config = $Configs.find(config => config.id == id)
+	
+	globalThis.config = config;
 	$: payloads = config.webclips;
 
 	let icon: string
@@ -32,22 +30,16 @@ import IconHandler from "./IconHandler.svelte";
 		}
 	}
 
-	export async function generate(evt: Event) {
-		evt.preventDefault()
-		let data = config;
-		for(let id in data.webclips) {
-			let webclip = data.webclips[id]
-			let icondata = await fetch(webclip.iconurl).then(r => r.arrayBuffer())
-			data.webclips[id].icon = new Uint8Array(icondata)
-		}
-		//console.log(data)
-		 let gen = generateConfig(data as Config)
-		 //console.log(gen)
-	 	let blob = new Blob([gen], {type: "application/x-apple-aspen-config"})
-	 	let url = URL.createObjectURL(blob)
-		//genbutton.value = "Generate"
-		dlurl = url;
-		dlset = true;
+	interface IconEvent extends Event {
+		detail: {
+			icon: string,
+			index: number
+		}	
+	}
+
+	function handleIcon(e: IconEvent) {
+		if(typeof e.detail.icon !== "string" || typeof e.detail.index !== "number") return false;
+		config.loadIcon(e.detail.index)
 	}
 
 	function addPayload() {
@@ -82,7 +74,7 @@ import IconHandler from "./IconHandler.svelte";
 </script>
 
 <main>
-	<form bind:this={exported.form} on:submit={generate} enctype="multipart/form-data">
+	<form enctype="multipart/form-data">
 		<div class="formgroup">
 			<h3>Config Settings</h3>
 			<input type="text" name="config_name" placeholder="Profile Name" bind:value={config.config_name} required/>
@@ -92,7 +84,7 @@ import IconHandler from "./IconHandler.svelte";
 				<div class="formgroup">
 						<EntryCell title="Web App Settings" on:message={handleCell} cellid={index}>
 							<input type="text" name="name[{index}]" placeholder="Name" bind:value={config.webclips[index].name} required/>
-							<IconHandler index={index} bind:icon={config.webclips[index].iconurl} />
+							<IconHandler index={index} on:message={handleIcon} bind:icon={config.webclips[index].iconurl} />
 							<input type="url" name="url[{index}]" placeholder="URL" bind:value={config.webclips[index].url} required/>
 						</EntryCell>
 				</div>
