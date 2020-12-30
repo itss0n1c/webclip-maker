@@ -6,8 +6,6 @@ import { Configs } from "./stores";
 
 	
 	let genbutton: HTMLInputElement
-	let dlset = false
-	let dlurl: string
 
 	export let id: string
 	
@@ -16,7 +14,6 @@ import { Configs } from "./stores";
 	globalThis.config = config;
 	$: payloads = config.webclips;
 
-	let icon: string
 
 	
 	function parsedDataURL(url: string): {mime: string, data: string} {
@@ -76,7 +73,6 @@ import { Configs } from "./stores";
 <main>
 	<form enctype="multipart/form-data">
 		<div class="formgroup">
-			<h3>Config Settings</h3>
 			<input type="text" name="config_name" placeholder="Profile Name" bind:value={config.config_name} required/>
 			<input type="text" name="config_author" placeholder="Profile Author" bind:value={config.config_author} required/>
 		</div>
@@ -92,25 +88,19 @@ import { Configs } from "./stores";
 			<div class="button" on:click={addPayload}>Add App</div>
 			<br /><br />
 
-		<!-- <input bind:this={genbutton} type="submit" class="submit" value="Generate" /> -->
 		
-		{#if dlset}
-			<p>Download: <a href={dlurl}>install.mobileconfig</a></p>
-		{/if}
 	</form>
 </main>
 
 
 <style>
-	
-
-	
-	
-	
+	main {
+		margin-top: 1.5rem;
+	}	
 
 	.button {
 		display: inline;
-		background: #007aff;
+		background: rgb(72, 72, 223);
 		padding-left: 1rem;
 		padding-right: 1rem;
 		padding-top: 0.5rem;

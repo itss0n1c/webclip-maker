@@ -118,7 +118,7 @@ function deleteConfig(e: MouseEvent) {
 		{#each configs as config}
 			<div class="cell">
 				<div class="info">
-					<p>{config.config_name}</p>
+					<p>{config.config_name || "Untitled Config"}</p>
 					<p>Web App count: {config.webclips.length}</p>
 				</div>
 				<div class="buttons">
@@ -129,16 +129,20 @@ function deleteConfig(e: MouseEvent) {
 				</div>
 			</div>
 		{:else}
-			<p>You don't seem to have any saved web app profiles... Make one below!</p>
+			<p>You don't seem to have any saved web app profiles... Make one above!</p>
 		{/each}
 	</section>
 	{#if showModal}
 		<div class="modal-overlay" on:click={closeProfile}></div>
 		<div class="modal show">
-			<div class="buttons">
-				<div class="blue" on:click={saveCurrent} bind:this={save_button}>Save Changes</div>
-				<div class="red" on:click={closeProfile}>&#10005;</div>
+			<div class="header">
+				<div class="title">Config Settings</div>
+				<div class="buttons">
+					<div class="blue" on:click={saveCurrent} bind:this={save_button}>Save</div>
+					<div class="red" on:click={closeProfile}>&#10005;</div>
+				</div>
 			</div>
+			
 			<AddApp id={currentConfig.id}/>
 		</div>
 	{/if}
@@ -235,13 +239,18 @@ function deleteConfig(e: MouseEvent) {
 		visibility: visible;
 		opacity:1;
 	}
-	
-	.modal .buttons {
-		float:right;
-		
+
+	.modal .header {
+		display:flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
-	.modal .buttons > div {
+	.modal .header .title {
+		font-size: 1.2rem;
+	}
+
+	.modal .header .buttons > div {
 		display: inline;
 		background: #2a2a2a;
 		padding-left: 1rem;

@@ -17,7 +17,7 @@ import { createEventDispatcher } from "svelte";
 
 <main>
 	<div class="header">
-	<h3>{title}</h3>
+		<p class="title">{title}</p>
 		<div class="controls">
 			<!-- <div>Save</div> -->
 			<div class="red" on:click={requestRemoval}>Remove</div>
@@ -34,6 +34,10 @@ import { createEventDispatcher } from "svelte";
 		display:flex;
 		justify-content: space-between;
 		align-items: center;
+	}
+
+	.header .title {
+		font-size: 1.2rem;
 	}
 
 	.header .controls > div {

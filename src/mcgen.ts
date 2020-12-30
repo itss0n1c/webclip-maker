@@ -22,8 +22,8 @@ export class Config {
 	webclips: WebClip[]
 	id: string
 	constructor(id?: string) {
-		this.config_name = 'Config Name';
-		this.config_author = 'Unknown';
+		this.config_name = '';
+		this.config_author = '';
 		this.webclips = [];
 		this.id = id || this.genString();
 	}
