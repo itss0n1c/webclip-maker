@@ -85,7 +85,7 @@ import { Configs } from "./stores";
 						</EntryCell>
 				</div>
 			{/each}
-			<div class="button" on:click={addPayload}>Add App</div>
+			<div class="button" on:click={addPayload}><i class="fas fa-plus"></i></div>
 			<br /><br />
 
 		

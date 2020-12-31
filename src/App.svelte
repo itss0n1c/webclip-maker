@@ -65,7 +65,7 @@ function saveCurrent() {
 	}
 	save_button.innerHTML = "Saved!";
 	configs = [...$Configs]
-	setTimeout(() => save_button.innerHTML = "Save Changes", 1000)
+	setTimeout(() => save_button.innerHTML = '<i class="far fa-save"></i>', 1000)
 }
 
 function ClickForConfig(e: MouseEvent): Config {
@@ -138,8 +138,8 @@ function deleteConfig(e: MouseEvent) {
 			<div class="header">
 				<div class="title">Config Settings</div>
 				<div class="buttons">
-					<div class="blue" on:click={saveCurrent} bind:this={save_button}>Save</div>
-					<div class="red" on:click={closeProfile}>&#10005;</div>
+					<div class="blue" on:click={saveCurrent} bind:this={save_button}><i class="far fa-save"></i></div>
+					<div class="red" on:click={closeProfile}><i class="fas fa-times"></i></div>
 				</div>
 			</div>
 			

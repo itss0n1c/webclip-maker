@@ -10,7 +10,16 @@
 	<link rel='stylesheet' href='global.css'>
 	<link rel='stylesheet' href='build/bundle.css'>
 	<script src="https://cdn.jsdelivr.net/npm/plist@3.0.1/dist/plist.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+	<script type="text/javascript">
+	(() => {
+		let css = document.createElement("link")
+		css.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
+		css.rel = "stylesheet"
+		css.type = "text/css";
+		document.head.appendChild(css)
+	})()
+	  </script>
+
 	<script defer src='build/bundle.js'></script>
 </head>
 
