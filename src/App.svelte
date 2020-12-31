@@ -14,6 +14,7 @@ let configs = $Configs;
 
 let showModal = false
 let save_button: HTMLDivElement
+let import_input: HTMLInputElement
 
 function createProfile() {
 	const config = new Config();
@@ -37,6 +38,15 @@ function getConfig(id): Config {
 		}
 	}
 	return found[0]
+}
+
+function loadConfig(id: string): Config {
+	if(typeof localStorage[`mconfig-${id}`] === "undefined") throw 404;
+	let config = new Config(id)
+	config.load(localStorage.getItem(`mconfig-${id}`))
+	$Configs.push(config)
+	configs = [...$Configs]
+	return config;
 }
 
 function openConfig(e: MouseEvent) {
@@ -106,6 +116,36 @@ function deleteConfig(e: MouseEvent) {
 	}
 }
 
+function genString(length = 10): string {
+	var result = '';
+	var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	var charactersLength = characters.length;
+	for (var i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+}
+
+async function importProfile() {
+	let file = import_input.files[0]
+	let reader = new FileReader()
+	let data: string
+	reader.onload = async (e) => {
+		data = e.target.result as string;
+		let id = genString();
+		let mconfig = await (await fetch(data)).text()
+		//console.log(mconfig)
+		localStorage.setItem(`mconfig-${id}`, mconfig)
+		let config = loadConfig(id)
+		console.log(config)
+	}
+	reader.readAsDataURL(file)
+}
+
+function openImport() {
+	import_input.click()
+}
+
 </script>
 
 <main>
@@ -113,7 +153,9 @@ function deleteConfig(e: MouseEvent) {
 		<h1>Webclip Maker</h1>
 	</section>
 	<section>
+		<input type="file" accept=".mobileconfig" bind:this={import_input} on:change={importProfile} hidden/>
 		<div class="button" on:click={createProfile}>Create</div>
+		<div class="button" on:click={openImport}>Import</div>
 		<h3>Saved Configurations</h3>
 		{#each configs as config}
 			<div class="cell">
@@ -164,6 +206,7 @@ function deleteConfig(e: MouseEvent) {
 		justify-content: center;
 		border-radius: 0.5rem;
 		text-decoration: none;
+		margin-bottom: 1rem;
 	}
 
 	.cell {
